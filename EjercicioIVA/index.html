@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <fieldset>
+        <legend>Productos</legend>
+        <input type="checkbox" name="Producto" id="p1" value="5"> Producto 1: 5€
+        <br>
+        <input type="checkbox" name="Producto" id="p2" value="30"> Producto 2: 30€
+        <br>
+        <input type="checkbox" name="Producto" id="p3" value="120"> Producto 3: 120€
+        <br>
+        <input type="checkbox" name="Producto" id="p4" value="40"> Producto 4: 40€
+        <br>
+        <input type="checkbox" name="Producto" id="p5" value="80"> Producto 5: 80€
+    </fieldset>
+
+    <fieldset>
+        <legend>IVA</legend>
+        <input type="radio" name="iva" id="iva4" value="4"> 4%
+        <br>
+        <input type="radio" name="iva" id="iva12" value="12"> 12%
+        <br>
+        <input type="radio" name="iva" id="iva21" value="21"> 21%
+    </fieldset>
+
+    <fieldset>
+        <legend>Totales</legend>
+        Sin IVA: <input type="text" name="" id="TxtSinIva" disabled>
+        <br>
+        Con IVA: <input type="text" name="" id="TxtConIva" disabled>
+    </fieldset>
+    <br>
+    <button id="btnCalcular" onclick="calcular()">Calcular</button>
+    <script>
+        var sinIVA = document.getElementById("TxtSinIva");
+        var conIVA = document.getElementById("TxtConIva");
+
+        function calcular() {
+            var total = 0; //Aqui es donde guardaremos el total de la suma de productos
+            var totalIVA = 0; //Lo mismo pero con IVA
+
+            //Aqui seleccionamos todos los inputs checkboxes
+            var chkProducto = document.querySelectorAll('input[type="checkbox"]');
+
+            chkProducto.forEach(function (checkbox) {
+                //Con esta funcion dentro del for each, vamos añadir el value de cada checkbox que se ha seleccionado, formando el coste total.
+                if (checkbox.checked) {
+                    total += parseFloat(checkbox.value);
+                    totalIVA += parseFloat(checkbox.value) * getIva() + parseFloat(checkbox.value);
+                }
+            });
+
+            //Por fin, cambiamos los campos de texto para observar el valor con y sin iva.
+            sinIVA.value = total;
+            conIVA.value = totalIVA;
+        }
+
+        function getIva() {
+            //Y aqui los inputs de tipo radiobutton
+            var iva = document.querySelectorAll('input[type="radio"]');
+            iva.forEach(function (radio) {
+                if (radio.checked) {
+                    iva = radio.value / 100; //pasamos el numero a decimal
+                }
+            });
+            return iva;
+        }
+    </script>
+</body>
+
+</html>
