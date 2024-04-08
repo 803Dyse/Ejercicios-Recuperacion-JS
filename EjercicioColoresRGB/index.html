@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>Mezcla de colores</h1>
+    <span>R <input type="range" name="" id="r" min="0" max="255" value="0" oninput="actualizarValores()"></span>
+    <span id="valorR">0</span>
+    <br>
+    <span>G <input type="range" name="" id="g" min="0" max="255" value="0" oninput="actualizarValores()"></span>
+    <span id="valorG">0</span>
+    <br>
+    <span>B <input type="range" name="" id="b" min="0" max="255" value="0" oninput="actualizarValores()"></span>
+    <span id="valorB">0</span>
+
+    <br><br>
+
+    <h1>Color resultante</h1>
+    <div id="colorResultante" style="width: 100px; height: 100px; border: solid black 0.5px;">
+    </div>
+
+    <script>
+        var red = document.getElementById("r");
+        var green = document.getElementById("g");
+        var blue = document.getElementById("b");
+
+        function actualizarValores() {
+            document.getElementById("valorR").innerHTML = r.value;
+            document.getElementById("valorG").innerHTML = g.value;
+            document.getElementById("valorB").innerHTML = b.value;
+
+            actualizarColor();//Aquí llamamos al metodo que permite atribuir colores a nuestro cuadrado según los cambios realizados.
+        }
+
+        function actualizarColor() {
+            var cr = document.getElementById("colorResultante");
+            cr.setAttribute("style", "width: 100px; height: 100px; border: solid black 0.5px; background-color: rgb(" + r.value + ", " + g.value + ", " + b.value + ");");
+        }
+    </script>
+</body>
+
+</html>
