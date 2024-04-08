@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -10,13 +10,14 @@
 <body>
     <h1>Mezcla de colores</h1>
     <span>R <input type="range" name="" id="r" min="0" max="255" value="0" oninput="actualizarValores()"></span>
-    <span id="valorR">0</span>
+    <input type="number" name="" id="valorR" min="0" max="255" value="0">
+
     <br>
     <span>G <input type="range" name="" id="g" min="0" max="255" value="0" oninput="actualizarValores()"></span>
-    <span id="valorG">0</span>
+    <input type="number" name="" id="valorG" min="0" max="255" value="0">
     <br>
     <span>B <input type="range" name="" id="b" min="0" max="255" value="0" oninput="actualizarValores()"></span>
-    <span id="valorB">0</span>
+    <input type="number" name="" id="valorB" min="0" max="255" value="0">
 
     <br><br>
 
@@ -30,17 +31,29 @@
         var blue = document.getElementById("b");
 
         function actualizarValores() {
-            document.getElementById("valorR").innerHTML = r.value;
-            document.getElementById("valorG").innerHTML = g.value;
-            document.getElementById("valorB").innerHTML = b.value;
-
-            actualizarColor();//Aquí llamamos al metodo que permite atribuir colores a nuestro cuadrado según los cambios realizados.
+            actualizarColor(); // Llama a esta función cuando se actualizan los sliders
         }
 
         function actualizarColor() {
             var cr = document.getElementById("colorResultante");
             cr.setAttribute("style", "width: 100px; height: 100px; border: solid black 0.5px; background-color: rgb(" + r.value + ", " + g.value + ", " + b.value + ");");
         }
+
+        //Detecta los cambios y los aplica inmediatamente
+        document.getElementById("valorR").addEventListener("input", function () {
+            red.value = this.value;
+            actualizarColor();
+        });
+
+        document.getElementById("valorG").addEventListener("input", function () {
+            green.value = this.value;
+            actualizarColor();
+        });
+
+        document.getElementById("valorB").addEventListener("input", function () {
+            blue.value = this.value;
+            actualizarColor();
+        });
     </script>
 </body>
 
