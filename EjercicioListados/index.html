@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    Escribe palabras separadas por ",". <br>
+    <input type="text" id="txt">
+    <button id="btn" onclick="cargarDatos()">Enviar</button>
+    <div id="resultado"></div>
+    
+    <script>
+        var texto = document.getElementById("txt").value.split(","); //Esto nos devuelve un array de las palabras.
+        var boton = document.getElementById("btn");
+
+
+        /*Esta funcion se encarga de recoger los datos del input.*/
+        function cargarDatos() {
+            var texto = document.getElementById("txt").value.split(",");
+            var resultado = document.getElementById("resultado");
+            
+            var ul = document.createElement("ul");
+            var li = document.createElement("li");
+
+            for (var i = 0; i < texto.length; i++) {
+                if (texto[i][0] === texto[i][0].toUpperCase()) {
+                    if (li.innerHTML !== "") {
+                        ul.appendChild(li);
+                    }
+                    li = document.createElement("li");
+                    li.innerHTML = texto[i];
+                    ul.appendChild(li);
+                } else {
+                    if (li.innerHTML === "") {
+                        li.innerHTML = "- " + texto[i];
+                    } else {
+                        li.innerHTML += ", " + texto[i];
+                    }
+                }
+            }
+
+            if (li.innerHTML !== "") {
+                ul.appendChild(li);
+            }
+
+            resultado.appendChild(ul);
+        }
+    </script>
+</body>
+
+</html>
