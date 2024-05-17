@@ -1,0 +1,17 @@
+<personas>
+  <persona>
+    <cod>001</cod>
+    <apel>Perez</apel>
+    <nombre>Pepe</nombre>
+  </persona>
+  <persona>
+    <cod>002</cod>
+    <apel>Gomez</apel>
+    <nombre>Ana</nombre>
+  </persona>
+  <persona>
+    <cod>003</cod>
+    <apel>Fernandez</apel>
+    <nombre>Antonio</nombre>
+  </persona>
+</personas>

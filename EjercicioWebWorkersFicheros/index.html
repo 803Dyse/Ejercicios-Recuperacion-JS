@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="salida"></div>
+    <script>
+        //Accedemos al archivo xml
+        function fetchXML(url, callback) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var xml = xhr.responseXML;
+                    callback(xml);
+                }
+            };
+            xhr.send();
+        }
+
+        //Accedemos al archivo json
+        function fetchJSON(url, callback) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var json = JSON.parse(xhr.responseText);
+                    callback(json);
+                }
+            };
+            xhr.send();
+        }
+
+
+        function processData() {
+            fetchXML('personas.xml', function (xmlData) {
+                fetchJSON('avisos.json', function (jsonData) {
+                    //Convertimos el xml en un array de objetos
+                    var personas = Array.from(xmlData.getElementsByTagName('persona')).map(function (persona) {
+                        return {
+                            cod: persona.getElementsByTagName('cod')[0].textContent,
+                            nombre: persona.getElementsByTagName('nombre')[0].textContent,
+                            apel: persona.getElementsByTagName('apel')[0].textContent,
+                        };
+                    });
+
+                    // convertimos el json en un listado
+                    var avisos = jsonData.reduce(function (acc, aviso) {
+                        acc[aviso.cod] = aviso.num_avisos;
+                        return acc;
+                    }, {});
+
+                    // limpiamos y actualizamos el contenido del div 
+                    var salida = document.getElementById('salida');
+                    salida.innerHTML = '';
+
+                    // Se generará texto para cada persona del xml
+                    personas.forEach(function (persona) {
+                        var numAvisos = avisos[persona.cod] || 0;
+                        var text = persona.nombre + ' ' + persona.apel + ' tiene ' + numAvisos + ' aviso(s)';
+                        var p = document.createElement('p');
+                        p.textContent = text;
+                        salida.appendChild(p);
+                    });
+                });
+            });
+        }
+
+        processData();
+
+        // creamos un web worker para que se actualice a cada 10 segs
+        if (window.Worker) {
+            var worker = new Worker('worker.js');
+            worker.onmessage = function () {
+                processData();
+            };
+            worker.postMessage('start');
+        }
+    </script>
+</body>
+
+</html>
