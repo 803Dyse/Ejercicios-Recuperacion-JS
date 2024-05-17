@@ -1,55 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Generador de Lista</title>
 </head>
-
 <body>
-    Escribe palabras separadas por ",". <br>
-    <input type="text" id="txt">
-    <button id="btn" onclick="cargarDatos()">Enviar</button>
+    <h1>Generador de Lista</h1>
+    <input type="text" id="inputTexto" placeholder="Palabras separadas por ','">
+    <button onclick="generarLista()">Generar Lista</button>
     <div id="resultado"></div>
-    
+
     <script>
-        var texto = document.getElementById("txt").value.split(","); //Esto nos devuelve un array de las palabras.
-        var boton = document.getElementById("btn");
+        function generarLista() {
+            const txt = document.getElementById('inputTexto').value; //obtenemos el contenido del input
+            //Lo dividimos en un array de palabras utilizando la función map para coger cada palabra y separarla 
+            //De modo que sea posible observar un margen entre las palabras de cada lista
+            const palabras = txt.split(',').map(palabra => palabra.trim()); 
+            const resultado = document.getElementById('resultado');
+            resultado.innerHTML = '';
 
+            var esNuevaLista = true; //Este booleano se utilizará para comprobar cuando hay 
+            //que repetir el proceso de generar una nueva lista
+            var container = document.createElement('div');//Creamos el div que nos permite sacar el resultado final.
 
-        /*Esta funcion se encarga de recoger los datos del input.*/
-        function cargarDatos() {
-            var texto = document.getElementById("txt").value.split(",");
-            var resultado = document.getElementById("resultado");
             
-            var ul = document.createElement("ul");
-            var li = document.createElement("li");
-
-            for (var i = 0; i < texto.length; i++) {
-                if (texto[i][0] === texto[i][0].toUpperCase()) {
-                    if (li.innerHTML !== "") {
-                        ul.appendChild(li);
+            palabras.forEach(palabra => {
+                //Comprobamos que la primera letra de dicha palabra empieza por mayuscula.
+                if (palabra.charAt(0).toUpperCase() === palabra.charAt(0)) {
+                    if (!esNuevaLista) { //Comprobamos también que esta palabra es de la misma lista
+                        //Una vez veámos que no es de una nueva lista, asociamos el resultado a la misma
+                        resultado.appendChild(container); //Reseteamos la flag para las nuevas listas que pueden generarse
                     }
-                    li = document.createElement("li");
-                    li.innerHTML = texto[i];
-                    ul.appendChild(li);
+                    //Aquí se creará un contenedor para la nueva y siguiente lista de palabras.
+                    container = document.createElement('div');
+                    container.appendChild(document.createTextNode('· ' + palabra)); //Añadimos el · para la palabra Mayúscula (siguiente palabra de la siguiente lista)
+                    esNuevaLista = false;//Reseteamos la flag para poder repetir el proceso
                 } else {
-                    if (li.innerHTML === "") {
-                        li.innerHTML = "- " + texto[i];
-                    } else {
-                        li.innerHTML += ", " + texto[i];
-                    }
+                    //Si empieza con minúscula, entonces se crea un div con margen para que se vea como una lista
+                    var itemHijo = document.createElement('div');
+                    //Añadimos un guión "-" para que visualmente se entienda como se presenta el elemento
+                    itemHijo.appendChild(document.createTextNode('- ' + palabra));
+                    //Añadimos un margin left para distinguir las palabras mayusculas de las minúsculas.
+                    itemHijo.style.marginLeft = '20px';
+                    container.appendChild(itemHijo);
                 }
-            }
+            });
 
-            if (li.innerHTML !== "") {
-                ul.appendChild(li);
-            }
-
-            resultado.appendChild(ul);
+            //Finalmente, sacamos por pantalla todo el conjunto de divs presentando la serie de listas que se crearán
+            resultado.appendChild(container);
         }
     </script>
 </body>
-
 </html>

@@ -17,7 +17,7 @@
     <input type="number" name="" id="valorG" min="0" max="255" value="0">
     <br>
     <span>B <input type="range" name="" id="b" min="0" max="255" value="0" oninput="actualizarValores()"></span>
-    <input type="number" name="" id="valorB" min="0" max="255" value="0">
+    <input type="number" name="" id="valorB" min="0" max="255" value="0" >
 
     <br><br>
 
@@ -31,15 +31,20 @@
         var blue = document.getElementById("b");
 
         function actualizarValores() {
-            actualizarColor(); // Llama a esta función cuando se actualizan los sliders
+            //Esta funciona iguala el valor de los slider con cada uno de sus inputs
+            //De modo que si controlamos valores sea por texto o por ratón, se corresponden.
+            document.getElementById("valorR").value = red.value;
+            document.getElementById("valorG").value = green.value;
+            document.getElementById("valorB").value = blue.value;
+            //llamamos a esta funciona para actualizar los valores.
+            actualizarColor();
         }
 
         function actualizarColor() {
             var cr = document.getElementById("colorResultante");
-            cr.setAttribute("style", "width: 100px; height: 100px; border: solid black 0.5px; background-color: rgb(" + r.value + ", " + g.value + ", " + b.value + ");");
+            cr.setAttribute("style", "width: 100px; height: 100px; border: solid black 0.5px; background-color: rgb(" + red.value + ", " + green.value + ", " + blue.value + ");");
         }
 
-        //Detecta los cambios y los aplica inmediatamente
         document.getElementById("valorR").addEventListener("input", function () {
             red.value = this.value;
             actualizarColor();
