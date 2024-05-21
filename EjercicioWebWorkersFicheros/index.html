@@ -4,82 +4,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Personas y Avisos</title>
 </head>
 
 <body>
-    <div id="salida"></div>
+    <div id="output"></div>
     <script>
-        //Accedemos al archivo xml
-        function fetchXML(url, callback) {
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', url, true);
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    var xml = xhr.responseXML;
-                    callback(xml);
-                }
-            };
-            xhr.send();
-        }
+        // Obtenemos todos los datos del XML y del JSON
+        function fetchData() {
+            var personasRequest = new XMLHttpRequest(); //XML
+            var avisosRequest = new XMLHttpRequest(); //JSON
 
-        //Accedemos al archivo json
-        function fetchJSON(url, callback) {
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', url, true);
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    var json = JSON.parse(xhr.responseText);
-                    callback(json);
-                }
-            };
-            xhr.send();
-        }
+            personasRequest.onreadystatechange = function () {
+                if (this.readyState === 4 && this.status === 200) {
+                    // Leemos y parseamos el XML
+                    var parser = new DOMParser();
+                    var personasXml = parser.parseFromString(this.responseText, "application/xml");
+                    var personas = []; //Array para añadir cada persona que obtenemos en en bucle for
+                    var personasElements = personasXml.querySelectorAll('persona'); //Seleccionamos la etiqueta <persona> del documento xml
 
-
-        function processData() {
-            fetchXML('personas.xml', function (xmlData) {
-                fetchJSON('avisos.json', function (jsonData) {
-                    //Convertimos el xml en un array de objetos
-                    var personas = Array.from(xmlData.getElementsByTagName('persona')).map(function (persona) {
-                        return {
-                            cod: persona.getElementsByTagName('cod')[0].textContent,
-                            nombre: persona.getElementsByTagName('nombre')[0].textContent,
-                            apel: persona.getElementsByTagName('apel')[0].textContent,
+                    // Recorremos cada <persona> y sacamos los datos de cada uno
+                    for (var i = 0; i < personasElements.length; i++) {
+                        var persona = {
+                            //Aqui se trata cada campo como un atributo del objeto <persona>
+                            //Cogemos el contenido textual de cada campo que tenga el elemento (cod, apellido y nombvre)
+                            cod: personasElements[i].querySelector('cod').textContent,
+                            apel: personasElements[i].querySelector('apel').textContent,
+                            nombre: personasElements[i].querySelector('nombre').textContent
                         };
-                    });
+                        personas.push(persona); //Una vez recorremos a todas las etiquetas <persona> lo pasamos al array
 
-                    // convertimos el json en un listado
-                    var avisos = jsonData.reduce(function (acc, aviso) {
-                        acc[aviso.cod] = aviso.num_avisos;
-                        return acc;
-                    }, {});
+                    }
 
-                    // limpiamos y actualizamos el contenido del div 
-                    var salida = document.getElementById('salida');
-                    salida.innerHTML = '';
+                    //leemos el archivo JSON
+                    avisosRequest.onreadystatechange = function () {
+                        if (this.readyState === 4 && this.status === 200) {
+                            // PParseamos el json
+                            var avisos = JSON.parse(this.responseText);
+                            var result = [];
 
-                    // Se generará texto para cada persona del xml
-                    personas.forEach(function (persona) {
-                        var numAvisos = avisos[persona.cod] || 0;
-                        var text = persona.nombre + ' ' + persona.apel + ' tiene ' + numAvisos + ' aviso(s)';
-                        var p = document.createElement('p');
-                        p.textContent = text;
-                        salida.appendChild(p);
-                    });
-                });
-            });
+                            // Recorremos cada persona y buscamos los avisos con la informacion del json
+                            for (var j = 0; j < personas.length; j++) {
+                                var persona = personas[j];
+                                var numAvisos = 0;
+
+                                // Buscamos el numero de avisos de cada persona, de forma iterativa
+                                for (var k = 0; k < avisos.length; k++) {
+                                    if (avisos[k].cod === persona.cod) {
+                                        //Si el cod de aviso corresponde con el cod de la persona pasamos igualamos la variable de numAvisos
+                                        //asociandola a la persona actual
+                                        numAvisos = avisos[k].num_avisos;
+                                    }
+                                }
+
+                                // Añadimos esta persona el arrayuna vez tenemos los datos del json sacados
+                                result.push({
+                                    nombre: persona.nombre,
+                                    apel: persona.apel,
+                                    num_avisos: numAvisos
+                                });
+                            }
+
+                            displayResult(result); //Esta función muestra los resultados en el documento html
+                        }
+                    };
+
+                    avisosRequest.open("GET", "avisos.json", true);
+                    avisosRequest.send();
+                }
+            };
+
+            // Envía la solicitud para el archivo personas.xml
+            personasRequest.open("GET", "personas.xml", true);
+            personasRequest.send();
         }
 
-        processData();
+        //Esta funcion saca los datos por pantalla, el parametro data se recibe como el resultado de la información recopilada
+        //una vez leemos el xml y el json.
+        function displayResult(data) {
+            var output = document.getElementById('output');
+            var resultHTML = '';
+            for (var i = 0; i < data.length; i++) {
+                //Aqui se recibirá los datos de cada documento de forma iterativa
+                resultHTML += data[i].nombre + ' ' + data[i].apel + ' tiene ' + data[i].num_avisos + ' avisos<br>';
+            }
+            output.innerHTML = resultHTML;
+        }
 
-        // creamos un web worker para que se actualice a cada 10 segs
-        if (window.Worker) {
+        // Llamamos a la funcion fetchData para pedir los datos y iniciar las solicitudes
+        fetchData();
+
+        // window.worker es un atributo del webworker que nos indica si el navegador soporta web workers o no
+        if (window.Worker) { 
             var worker = new Worker('worker.js');
-            worker.onmessage = function () {
-                processData();
-            };
-            worker.postMessage('start');
+            worker.onmessage = function (e) {
+                // Si el mensaje es 'update', vuelve a cargar los datos
+                //el webworker, nos dirá 'update' a cada 10s
+                if (e.data === 'update') {
+                    fetchData();
+                }
+            }
         }
     </script>
 </body>
